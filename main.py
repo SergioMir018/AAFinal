@@ -1,29 +1,22 @@
-import os
-import pandas as pd
-
-DATA_PATH = os.path.join("data", "shuttle-landing-control.data")
-
-def load_data(file_path):
-    try:
-        
-        column_names = [
-            "Class", "Stability", "Error", "Sign", 
-            "Wind", "Magnitude", "Visibility"
-        ]
-
-        data = pd.read_csv(file_path, names=column_names, delimiter=",", skipinitialspace=True)
-        return data
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo en {file_path}")
-        return None
+from src import preprocess 
+from src import knn
 
 def main():
     print("=== Shuttle Landing Control Project ===")
     
-    data = load_data(DATA_PATH)
+    data = preprocess.load_data()
+
     if data is not None:
         print(f"Dataset cargado correctamente con {len(data)} filas:")
         print(data.head())
+
+        data_scaled = preprocess.preprocess_data(data)
+
+        test_point = [1, 0, 1, 1, 2, 1]
+        k = 5
+        print(f"=== Data after KNN, with K={k}  ===")
+        predicted_class = knn.knn(data_scaled.values.tolist(), test_point, k)
+        print(f"Clase predicha para el punto {test_point}: {predicted_class}")
     else:
         print("Por favor, verifica la ruta del archivo o si el archivo existe.")
 
